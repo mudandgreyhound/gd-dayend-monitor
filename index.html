@@ -3,54 +3,87 @@
 <title>Day End Monitor</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',Tahoma,sans-serif;background:#f5f6f8;color:#1f2937;padding:18px}
-.wrap{max-width:1200px;margin:0 auto}
-.head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px}
-.title{font-size:20px;font-weight:600}.sub{font-size:13px;color:#6b7280}
-.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
-.card{border-radius:10px;padding:12px 14px}.card .l{font-size:12px}.card .v{font-size:24px;font-weight:600}
-.c0{background:#fff;border:1px solid #e5e7eb}.c0 .l{color:#6b7280}
-.c1{background:#e1f5ee}.c1 .l{color:#0f6e56}.c1 .v{color:#085041}
-.c2{background:#faeeda}.c2 .l{color:#854f0b}.c2 .v{color:#633806}
-.c3{background:#fcebeb}.c3 .l{color:#a32d2d}.c3 .v{color:#791f1f}
-.tw{overflow-x:auto;border:1px solid #e5e7eb;border-radius:10px}
-table{width:100%;border-collapse:collapse;background:#fff;font-size:13px;min-width:780px}
-th{background:#f3f4f6;text-align:left;padding:10px;font-weight:600;color:#374151}
-td{padding:8px 10px;border-top:1px solid #f0f1f3}
-.mono{font-family:'Consolas',monospace}
-.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:7px;font-size:12px;font-weight:600}
-.b-ok{background:#e1f5ee;color:#085041}.b-late{background:#faeeda;color:#633806}
-.b-long{background:#fcebeb;color:#791f1f}.b-no{background:#f3f4f6;color:#6b7280}
-.muted{color:#9ca3af}
-.cell{margin:0 auto;width:24px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600}
-.on{background:#1d9e75;color:#fff}.off{background:#ececec;color:#bbb;border:1px solid #e0e0e0}
-.dh{text-align:center;font-size:10px;color:#9ca3af;font-weight:400}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:#f5f6f8;color:#1f2937;padding:14px}
+.wrap{max-width:900px;margin:0 auto}
+.title{font-size:18px;font-weight:600;line-height:1.3}
+.sub{font-size:12px;color:#6b7280;margin:4px 0 14px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#1d9e75;vertical-align:1px}
 .err{background:#fcebeb;color:#791f1f;padding:8px 12px;border-radius:8px;font-size:12px;margin-bottom:12px;display:none}
+
+/* ---- summary cards = filter ---- */
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+@media(max-width:560px){.cards{grid-template-columns:repeat(2,1fr)}}
+.card{border-radius:12px;padding:11px 13px;cursor:pointer;border:2px solid transparent;transition:.12s;user-select:none}
+.card .l{font-size:12px}.card .v{font-size:23px;font-weight:700;line-height:1.1;margin-top:2px}
+.card.active{border-color:currentColor;filter:saturate(1.1)}
+.c0{background:#fff;border:1px solid #e5e7eb}.c0 .l{color:#6b7280}.c0.active{border-color:#9ca3af}
+.c1{background:#e1f5ee;color:#0f6e56}.c1 .v{color:#085041}
+.c2{background:#faeeda;color:#854f0b}.c2 .v{color:#633806}
+.c3{background:#fcebeb;color:#a32d2d}.c3 .v{color:#791f1f}
+
+/* ---- shop list (cards) ---- */
+.list{display:flex;flex-direction:column;gap:8px}
+.item{background:#fff;border:1px solid #eceef0;border-radius:12px;padding:11px 12px}
+.it-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.it-name{min-width:0}
+.it-code{font-family:'Consolas',monospace;color:#2563eb;font-size:12px;font-weight:600}
+.it-shop{font-size:14px;font-weight:600;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.it-right{text-align:right;flex-shrink:0}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap}
+.b-ok{background:#e1f5ee;color:#085041}.b-late{background:#faeeda;color:#633806}.b-long{background:#fcebeb;color:#791f1f}
+.it-days{font-size:11px;color:#dc2626;font-weight:600;margin-top:3px}
+.strip{display:flex;gap:5px;margin-top:10px}
+.day{flex:1;text-align:center}
+.day .dl{font-size:9px;color:#9ca3af;margin-bottom:3px}
+.cell{height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.on{background:#1d9e75;color:#fff}.off{background:#f0f1f3;color:#cbd0d6;border:1px solid #e6e8eb}
+.empty{text-align:center;color:#9ca3af;font-size:13px;padding:24px}
 </style></head>
 <body><div class="wrap">
-  <div class="head">
-    <div class="title">📋 Day End Monitor — สถานะปิดยอดรายสาขา</div>
-    <div class="sub"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#1d9e75"></span>
-      auto-refresh · <span id="ts">-</span></div>
-  </div>
+  <div class="title">📋 Day End Monitor — สถานะปิดยอดรายสาขา</div>
+  <div class="sub"><span class="dot"></span> auto-refresh · <span id="ts">-</span></div>
   <div class="err" id="err"></div>
+
   <div class="cards">
-    <div class="card c0"><div class="l">ทั้งหมด</div><div class="v" id="s-total">-</div></div>
-    <div class="card c1"><div class="l">ปกติ</div><div class="v" id="s-ok">-</div></div>
-    <div class="card c2"><div class="l">ค้าง</div><div class="v" id="s-late">-</div></div>
-    <div class="card c3"><div class="l">ค้างนาน / ไม่มีข้อมูล</div><div class="v" id="s-bad">-</div></div>
+    <div class="card c0 active" data-f="ALL"><div class="l">ทั้งหมด</div><div class="v" id="s-total">-</div></div>
+    <div class="card c1" data-f="OK"><div class="l">ปกติ</div><div class="v" id="s-ok">-</div></div>
+    <div class="card c2" data-f="LATE1"><div class="l">ค้าง</div><div class="v" id="s-late">-</div></div>
+    <div class="card c3" data-f="LATE_LONG"><div class="l">ค้างนาน</div><div class="v" id="s-bad">-</div></div>
   </div>
-  <div class="tw"><table>
-    <thead><tr id="thr"><th>#</th><th>รหัส</th><th>ชื่อสาขา</th><th>สถานะ</th><th style="text-align:center">ค้าง</th></tr></thead>
-    <tbody id="tb"></tbody>
-  </table></div>
+
+  <div class="list" id="list"></div>
 </div>
 <script>
-// ===== แก้ตรงนี้: URL ของ FastAPI (ต้องเป็น HTTPS เพราะ GitHub Pages เป็น HTTPS) =====
 const API_BASE = "https://dayendmonitor.mobile1234.site";
-// ===================================================================================
+const MAP={OK:{c:"b-ok",i:"✅",t:"ปกติ"},LATE1:{c:"b-late",i:"⚠️",t:"ค้าง"},LATE_LONG:{c:"b-long",i:"⛔",t:"ค้างนาน"}};
 
-const MAP={OK:{c:"b-ok",i:"✅"},LATE1:{c:"b-late",i:"⚠️"},LATE_LONG:{c:"b-long",i:"⛔"},NODATA:{c:"b-no",i:"➖"}};
+let allRows=[], dates=[], filter="ALL";
+
+function render(){
+  const rows = filter==="ALL" ? allRows : allRows.filter(r=>r.status===filter);
+  const L=document.getElementById("list");
+  if(!rows.length){ L.innerHTML='<div class="empty">— ไม่มีสาขาในกลุ่มนี้ —</div>'; return; }
+  L.innerHTML = rows.map(r=>{
+    const m=MAP[r.status]||MAP.LATE_LONG;
+    const days = (r.days_behind!=null && r.days_behind>0) ? '<div class="it-days">ค้าง '+r.days_behind+' วัน</div>' : '';
+    const strip = (r.strip||[]).map((x,i)=>
+      '<div class="day"><div class="dl">'+(dates[i]||'')+'</div>'
+      +'<div class="cell '+(x?'on':'off')+'">'+(x?'X':'')+'</div></div>').join("");
+    return '<div class="item">'
+      +'<div class="it-top">'
+        +'<div class="it-name"><div class="it-code">'+r.code+'</div><div class="it-shop">'+r.name+'</div></div>'
+        +'<div class="it-right"><span class="badge '+m.c+'">'+m.i+' '+m.t+'</span>'+days+'</div>'
+      +'</div>'
+      +'<div class="strip">'+strip+'</div>'
+    +'</div>';
+  }).join("");
+}
+
+document.querySelectorAll(".card").forEach(c=>c.addEventListener("click",()=>{
+  document.querySelectorAll(".card").forEach(x=>x.classList.remove("active"));
+  c.classList.add("active"); filter=c.dataset.f; render();
+}));
+
 async function load(){
   try{
     const j=await(await fetch(API_BASE+"/api/status",{cache:"no-store"})).json();
@@ -61,21 +94,7 @@ async function load(){
     document.getElementById("s-ok").textContent=j.summary.ok;
     document.getElementById("s-late").textContent=j.summary.late;
     document.getElementById("s-bad").textContent=j.summary.bad;
-    let thr='<th>#</th><th>รหัส</th><th>ชื่อสาขา</th><th>สถานะ</th><th style="text-align:center">ค้าง</th>';
-    thr+=(j.dates||[]).map(d=>'<th class="dh">'+d+'</th>').join("");
-    document.getElementById("thr").innerHTML=thr;
-    document.getElementById("tb").innerHTML=j.rows.map((r,i)=>{
-      const m=MAP[r.status]||MAP.NODATA;
-      const days=r.days_behind==null?'<span class="muted">-</span>'
-        :(r.days_behind<=0?'<span style="color:#1d9e75;font-weight:600">0</span>'
-        :'<span style="color:#dc2626;font-weight:600">'+r.days_behind+'</span>');
-      const strip=(r.strip||[]).map(x=>'<td><div class="cell '+(x?'on':'off')+'">'+(x?'X':'')+'</div></td>').join("");
-      return '<tr><td class="muted">'+(i+1)+'</td>'
-        +'<td class="mono" style="color:#2563eb">'+r.code+'</td>'
-        +'<td style="white-space:nowrap">'+r.name+'</td>'
-        +'<td><span class="badge '+m.c+'">'+m.i+' '+r.status_tx+'</span></td>'
-        +'<td style="text-align:center">'+days+'</td>'+strip+'</tr>';
-    }).join("");
+    allRows=j.rows||[]; dates=j.dates||[]; render();
   }catch(e){
     document.getElementById("ts").textContent="โหลดไม่ได้: "+e;
     const el=document.getElementById("err");el.style.display="block";
