@@ -59,7 +59,7 @@ async function load(){
     if(j.error){e.style.display="block";e.textContent="⚠ ETL: "+j.error;}else{e.style.display="none";}
     document.getElementById("s-total").textContent=j.summary.total;
     document.getElementById("s-ok").textContent=j.summary.ok;
-    document.getElementById("s-late").textContent=j.summary.late;⚠ เชื่อมต่อ API ไม่ได้ 
+    document.getElementById("s-late").textContent=j.summary.late;
     document.getElementById("s-bad").textContent=j.summary.bad;
     let thr='<th>#</th><th>รหัส</th><th>ชื่อสาขา</th><th>สถานะ</th><th style="text-align:center">ค้าง</th>';
     thr+=(j.dates||[]).map(d=>'<th class="dh">'+d+'</th>').join("");
